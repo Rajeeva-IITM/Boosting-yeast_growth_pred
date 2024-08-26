@@ -1,0 +1,23 @@
+data:
+  train_data: ${oc.env:ROOT_DIR}/data/chem_subsets/new_latent/carbons/carbons_bloom2013_clf_3_pubchem.feather
+  test_data: ${oc.env:ROOT_DIR}/data/chem_subsets/new_latent/carbons/carbons_bloom2015_clf_3_pubchem.feather
+  savename: Carbons_Bloom2013_on_Bloom2015
+  savedir: ${oc.env:ROOT_DIR}/runs/chem_subsets/sampler/${data.savename}/
+
+n_trials: 200
+seed: 42
+repeat_num: 50
+
+repeat_samples: true
+
+model:
+  lambda_l1: 0.001
+  lambda_l2: 0.001
+  num_leaves: 32
+  feature_fraction: 0.8
+  bagging_fraction: 0.8
+  bagging_freq: 5
+  min_child_samples: 20
+  learning_rate: 0.1
+  n_estimators: 500
+  seed: 42
