@@ -218,7 +218,7 @@ def verify_path(path: str):
         console.print(f"Created directory at [red]{path}[/red]", justify="center")
 
 
-@hydra.main(version_base=None, config_path="./configs/", config_name="conf")
+@hydra.main(version_base=None, config_path="../configs/", config_name="conf")
 def main(conf: DictConfig):
     """The main function that serves as the entry point for the program.
 
