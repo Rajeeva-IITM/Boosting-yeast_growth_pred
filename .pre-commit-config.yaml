@@ -5,7 +5,7 @@ exclude: ^main_code/FGR/
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.5.0
+    rev: v4.6.0
     hooks:
       # list of supported hooks: https://pre-commit.com/hooks.html
       - id: trailing-whitespace
@@ -35,7 +35,7 @@ repos:
 
   # python upgrading syntax to newer version
   - repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.0
+    rev: v3.17.0
     hooks:
       - id: pyupgrade
         args: [--py38-plus]
@@ -56,7 +56,7 @@ repos:
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
-    rev: v0.1.4
+    rev: v0.6.2
     hooks:
       # Run the linter.
       - id: ruff
@@ -67,7 +67,7 @@ repos:
 
   # python docstring coverage checking
   - repo: https://github.com/econchick/interrogate
-    rev: 1.5.0 # or master if you're bold
+    rev: 1.7.0 # or master if you're bold
     hooks:
       - id: interrogate
         args: [
@@ -112,7 +112,7 @@ repos:
 
   # shell scripts linter
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.9.0.6
+    rev: v0.10.0.1
     hooks:
       - id: shellcheck
 
@@ -131,7 +131,7 @@ repos:
 
   # word spelling linter
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.3.0
     hooks:
       - id: codespell
         args:
@@ -140,13 +140,13 @@ repos:
 
   # jupyter notebook cell output clearing
   - repo: https://github.com/kynan/nbstripout
-    rev: 0.6.1
+    rev: 0.7.1
     hooks:
       - id: nbstripout
 
   # jupyter notebook linting
   - repo: https://github.com/nbQA-dev/nbQA
-    rev: 1.7.1
+    rev: 1.8.7
     hooks:
       - id: nbqa-black
         args: ["--line-length=99"]
