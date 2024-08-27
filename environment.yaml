@@ -214,7 +214,7 @@ dependencies:
 - pytz=2024.1=pyhd8ed1ab_0
 - pyyaml=6.0.1=py312h98912ed_1
 - pyzmq=25.1.2=py312h886d080_0
-- rdma-core=50.0=hd3aeb46_0
+# - rdma-core=50.0=hd3aeb46_0    # This is throwing some error. Better to install manually if needed
 - re2=2023.09.01=h7f4b329_2
 - readline=8.2=h8228510_1
 - referencing=0.33.0=pyhd8ed1ab_0
