@@ -1,12 +1,22 @@
-model_types:
-  - Boosting
-  - RandomForest
+run_path: ${oc.env:RUN_DIR}/chem_subsets/Final
+out_path: ${oc.env:ROOT_DIR}/boosting/performance/Final
+data_path: ${oc.env:DATA_DIR}/chem_subsets/new_latent/carbons
 
 run_type: full # Must be one of full, geno_only, chem_only, dummy
 
-run_path: /home/rajeeva/Project/runs/chem_subsets/Final/
-out_path: /home/rajeeva/Project/boosting/performance/Final/
-data_path: /home/rajeeva/Project/data/chem_subsets/new_latent/carbons/
+# These are for getting the model from different directories
+# The structure is {run_path}/{prefix}{model_name}*{suffix}/{model_type}.pkl
+model_load_keys:
+  run_path: ${run_path}
+  model_type: Boosting # Must be one of Boosting, RandomForest, SVM, LogReg
+  prefix: Carbons_
+  suffix: ${run_type}
+  model_names:
+    - Bloom2013
+    - Bloom2015
+    - Bloom2019
+    - Bloom2019_BYxM22
+    - Bloom2019_RMxYPS163
 
 data_paths:
   Bloom2013: ${data_path}/carbons_bloom2013_clf_3_pubchem.feather

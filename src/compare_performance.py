@@ -5,6 +5,7 @@ import pickle
 # from os import listdir
 from pathlib import Path
 from typing import Union
+from dotenv import load_dotenv
 
 import hydra
 import numpy as np
@@ -17,6 +18,8 @@ from rich import print
 from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef, roc_auc_score
 
 from typing import Dict, List
+
+load_dotenv()
 
 
 def get_preds(
@@ -102,43 +105,29 @@ def eval_model(pred_df: pl.DataFrame) -> pl.DataFrame:
 
 
 def get_model_paths(
-    run_path: Path, model_type: str, suffix: str
+    run_path: str, model_type: str, suffix: str, prefix: str, model_names: List[str]
 ) -> Dict[str, List[Path]]:
     """Retrieves the paths of the models in a given directory based on the provided model type and
     suffix.
 
     Parameters:
-        run_path (Path): The directory containing the models.
+        run_path (str): The directory containing the models.
         model_type (str): The type of model to retrieve (e.g. lgbm, dummy).
         suffix (str): The suffix of the model (e.g. full, geno_only, chem_only, dummy).
+        prefix (str): The prefix of the model paths (e.g. Bloom2013_).
+        model_names (List[str]): The list of models to retrieve.
 
     Returns:
         Dict[str, List[Path]]: A dictionary with the model names as keys and the
             paths to the models as values.
     """
-    suffix = "" if suffix == "full" else suffix  # full models have no suffix
+    suffix = "" if suffix == "full" else suffix
+
+    run_path = Path(run_path)
 
     model_paths = {
-        "Bloom2013": list(
-            run_path.glob(f"Carbons_Bloom2013*{suffix}/{model_type}.pkl")
-        ),
-        # "Bloom2013_binary": run_path.glob("Carbons_Bloom2013_Modified_hyperparams_binary_*.pkl"),
-        "Bloom2015": list(
-            run_path.glob(f"Carbons_Bloom2015*{suffix}/{model_type}.pkl")
-        ),
-        # "Bloom2015_binary": run_path.glob("Carbons_Bloom2015_Modified_hyperparams_binary_*.pkl"),
-        "Bloom2019": list(
-            run_path.glob(f"Carbons_Bloom2019*{suffix}/{model_type}.pkl")
-        ),
-        # "Bloom2019_binary": run_path.glob("Carbons_Bloom2019_Modified_hyperparams_binary_*.pkl"),
-        "Bloom2019_BYxM22": list(
-            run_path.glob(f"Carbons_Bloom2019_BYxM22_*{suffix}/{model_type}.pkl")
-        ),
-        # "Bloom2019_BYxM22_binary": run_path.glob("Carbons_Bloom2019_BYxM22_Modified_hyperparams_binary_*.pkl"),
-        "Bloom2019_RMxYPS163": list(
-            run_path.glob(f"Carbons_Bloom2019_RMxYPS163_*{suffix}/{model_type}.pkl")
-        ),
-        # "Bloom2019_RMxYPS163_binary": run_path.glob("Carbons_Bloom2019_RMxYPS163_Modified_hyperparams_binary_*.pkl"),
+        model: list(run_path.glob(f"{prefix}{model}*{suffix}/{model_type}.pkl"))
+        for model in model_names
     }
 
     return model_paths
@@ -162,28 +151,34 @@ def get_results(conf: DictConfig):
     Returns:
         None
     """
-    run_path = Path(conf.run_path)
+    # run_path = Path(conf.run_path)
     # data_path = Path(conf.data_paths)
     out_path = Path(conf.out_path)
+    model_type = conf.model_load_keys.model_type
+    model_paths = get_model_paths(**conf.model_load_keys)
 
-    for model_type in conf.model_types:
-        model_paths = get_model_paths(run_path, model_type, conf.run_type)
-        for model_name, model_path in model_paths.items():
-            for data_name, data_path in conf.data_paths.items():
-                print(model_name, data_name)
-                result_df = get_preds_kfold(model_path, data_path, conf.run_type)
-                metric_df = eval_model(result_df)
+    assert (
+        len(conf.model_load_keys.model_names) == len(conf.data_paths)
+    ), f"Mismatch between data {len(conf.data_paths)} and model {len(conf.model_load_keys.model_names)} and model names"
 
-                result_df.write_csv(
-                    out_path / f"predictions_{model_name}_{data_name}_{model_type}.csv"
-                )
+    print(model_paths)
 
-                metric_df.write_csv(
-                    out_path / f"metrics_{model_name}_{data_name}_{model_type}.csv"
-                )
+    for model_name, model_path in model_paths.items():
+        for data_name, data_path in conf.data_paths.items():
+            print(model_name, data_name)
+            result_df = get_preds_kfold(model_path, data_path, conf.run_type)
+            metric_df = eval_model(result_df)
+
+            result_df.write_csv(
+                out_path / f"predictions_{model_name}_{data_name}_{model_type}.csv"
+            )
+
+            metric_df.write_csv(
+                out_path / f"metrics_{model_name}_{data_name}_{model_type}.csv"
+            )
 
 
-@hydra.main(config_path="./configs/", version_base="1.1", config_name="eval")
+@hydra.main(config_path="../configs/", version_base="1.3", config_name="eval")
 def main(conf: DictConfig) -> None:
     """The main entry point of the script.
 
