@@ -1,0 +1,44 @@
+model_params:
+  # Unchanging parameters
+  objective: binary
+  verbosity: -10
+  force_col_wise: true
+  early_stopping_rounds: 10
+  num_threads: 30
+  boosting_type: gbdt # gbdt, dart, rf
+  # seed: ${seed}
+  # Parameters to tune
+  lambda_l1:
+    low: 1.e-8
+    high: 10
+    log: true
+  lambda_l2:
+    low: 1.e-8
+    high: 10
+    log: true
+  num_leaves:
+    low: 2
+    high: 256
+    log: false
+  feature_fraction:
+    low: 0.1
+    high: 0.99 # To ensure compatibility with rf mode
+    log: false
+  bagging_fraction:
+    low: 0.1
+    high: 0.99
+    log: false
+  bagging_freq:
+    low: 1
+    high: 10
+  min_child_samples:
+    low: 5
+    high: 100
+    log: false
+  learning_rate:
+    low: 1.e-3
+    high: 1.e-1
+    log: true
+  n_estimators:
+    low: 10
+    high: 1000

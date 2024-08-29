@@ -100,24 +100,34 @@ def tune_LGBM(
     """
     # Boosting parameters
     params = {
-        "objective": "binary",
-        "verbosity": -10,
-        "force_col_wise": True,
-        "early_stopping_rounds": 10,
-        "num_threads": 30,
-        "boosting_type": config.model_params.boosting,
+        "objective": config.model_params.objective,
+        "verbosity": config.model_params.verbosity,
+        "force_col_wise": config.model_params.force_col_wise,
+        "early_stopping_rounds": config.model_params.early_stopping_rounds,
+        "num_threads": config.model_params.num_threads,
+        "boosting_type": config.model_params.boosting_type,
         "seed": config.seed,
-        "lambda_l1": trial.suggest_float("lambda_l1", 1e-8, 10.0, log=True),
-        "lambda_l2": trial.suggest_float("lambda_l2", 1e-8, 10.0, log=True),
-        "num_leaves": trial.suggest_int("num_leaves", 2, 256),
-        "feature_fraction": trial.suggest_float("feature_fraction", 0.1, 0.99),
-        "bagging_fraction": trial.suggest_float("bagging_fraction", 0.1, 0.99),
-        "bagging_freq": trial.suggest_int("bagging_freq", 1, 10),
-        "min_child_samples": trial.suggest_int("min_child_samples", 5, 100),
-        "learning_rate": trial.suggest_float("learning_rate", 1e-3, 1e-1, log=True),
+        "lambda_l1": trial.suggest_float("lambda_l1", **config.model_params.lambda_l1),
+        "lambda_l2": trial.suggest_float("lambda_l2", **config.model_params.lambda_l2),
+        "num_leaves": trial.suggest_int("num_leaves", **config.model_params.num_leaves),
+        "feature_fraction": trial.suggest_float(
+            "feature_fraction", **config.model_params.feature_fraction
+        ),
+        "bagging_fraction": trial.suggest_float(
+            "bagging_fraction", **config.model_params.bagging_fraction
+        ),
+        "bagging_freq": trial.suggest_int(
+            "bagging_freq", **config.model_params.bagging_freq
+        ),
+        "min_child_samples": trial.suggest_int(
+            "min_child_samples", **config.model_params.min_child_samples
+        ),
+        "learning_rate": trial.suggest_float(
+            "learning_rate", **config.model_params.learning_rate
+        ),
     }
 
-    n_estimators = trial.suggest_int("n_estimators", 100, 1000)
+    n_estimators = trial.suggest_int("n_estimators", **config.model_params.n_estimators)
 
     splits = KFold(
         n_splits=config.kfold_params.n_splits,
@@ -311,7 +321,7 @@ def main(conf: DictConfig):
 
     study_name = (
         conf.models.Boosting.name
-        if conf.model_params.boosting == "gbdt"
+        if conf.model_params.boosting_type == "gbdt"
         else conf.models.RandomForest.name
     )
 

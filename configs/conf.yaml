@@ -1,7 +1,11 @@
+defaults:
+  - model_params
+  - _self_
+
 data:
   path: ${oc.env:ROOT_DIR}/data/chem_subsets/new_latent/carbons/carbons_bloom2013_clf_3_pubchem.feather
   savename: Carbons_Bloom2013
-  savedir: ${oc.env:ROOT_DIR}/runs/chem_subsets/Final/dummies/${data.savename}_${seed}
+  savedir: ${oc.env:ROOT_DIR}/runs/chem_subsets/Final/dummies/${data.savename} # Better to save as ${data.savename}_${seed}_${run_type}
 
 n_trials: 100
 
@@ -26,23 +30,12 @@ dummy: # for creating baseline models
   run: false # When false we don't care
   strategy: stratified # strategy compatible with sklearn.dummy.DummyClassifier
 
-model_params:
-  boosting: gbdt # gbdt, dart, rf
-
 models:
-  LogReg:
-    name: LogReg
-    model_savename: ${data.savedir}_${seed}/${models.LogReg.name}.pkl # A folder is created for each seed, useful when running multiple seeds
-
-  SVM:
-    name: SVM
-    model_savename: ${data.savedir}_${seed}/${models.SVM.name}.pkl
-
   RandomForest:
     name: RandomForest
-    model_savename: ${data.savedir}_${seed}/${models.RandomForest.name}.pkl
+    model_savename: ${data.savedir}/${models.RandomForest.name}.pkl # A folder is created for each seed, useful when running multiple seeds
 
   Boosting:
     name: Boosting
     # device: "cuda:1"
-    model_savename: ${data.savedir}_${seed}/${models.Boosting.name}.pkl
+    model_savename: ${data.savedir}/${models.Boosting.name}.pkl
