@@ -1,22 +1,23 @@
 # Running the chemical subsets results again because consistency and I'm an idiot
+import logging
 import pickle
-from pathlib import Path
 import sys
+from pathlib import Path
+from typing import Callable
+
 import hydra
+import lightgbm as lgb
 import numpy as np
 import optuna
 import polars as pl
-import logging
 import polars.selectors as cs
-import lightgbm as lgb
 from dotenv import load_dotenv
 from omegaconf import DictConfig
 from rich.console import Console
 from rich.logging import RichHandler
+from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import StandardScaler
-from sklearn.dummy import DummyClassifier
-from typing import Callable
 
 load_dotenv()
 
@@ -249,14 +250,18 @@ def main(conf: DictConfig):
         case "geno_only":
             df = df.select(
                 pl.col("Strain"),
-                cs.starts_with("Y"),  # Only the genotype columns
+                cs.starts_with(
+                    "Y"
+                ),  # Only the genotype columns, based on yeast systemic names # TODO: Hardcoded for now. But should be flexible
                 pl.col("Condition"),
                 pl.col("Phenotype"),
             )
         case "chem_only":
             df = df.select(
                 pl.col("Strain"),
-                cs.contains("latent"),  # Only the chemical information
+                cs.contains(
+                    "latent"
+                ),  # Only the chemical information # TODO: Hardcoded for now. But should be flexible
                 pl.col("Condition"),
                 pl.col("Phenotype"),
             )

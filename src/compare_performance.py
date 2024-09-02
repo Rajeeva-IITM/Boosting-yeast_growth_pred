@@ -1,4 +1,4 @@
-# Compare performance of binary and non-binary model
+# Compare performance of any two model
 
 import pickle
 
@@ -121,7 +121,7 @@ def get_model_paths(
         Dict[str, List[Path]]: A dictionary with the model names as keys and the
             paths to the models as values.
     """
-    suffix = "" if suffix == "full" else suffix
+    # suffix = "" if suffix == "full" else suffix
 
     run_path = Path(run_path)
 
