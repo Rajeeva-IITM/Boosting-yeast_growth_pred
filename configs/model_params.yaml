@@ -4,7 +4,7 @@ model_params:
   verbosity: -10
   force_col_wise: true
   early_stopping_rounds: 10
-  num_threads: 30
+  num_threads: ${oc.env:NUM_THREADS} # Number of threads to use, from .env file
   boosting_type: gbdt # gbdt, dart, rf
   # seed: ${seed}
   # Parameters to tune
