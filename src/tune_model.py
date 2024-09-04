@@ -107,7 +107,13 @@ def tune_LGBM(
         "early_stopping_rounds": config.model_params.early_stopping_rounds,
         "num_threads": config.model_params.num_threads,
         "boosting_type": config.model_params.boosting_type,
+        
+        "device_type": config.model_params.device_type,
+        "gpu_use_dp": config.model_params.gpu_use_dp,
+        
         "seed": config.seed,
+        
+        
         "lambda_l1": trial.suggest_float("lambda_l1", **config.model_params.lambda_l1),
         "lambda_l2": trial.suggest_float("lambda_l2", **config.model_params.lambda_l2),
         "num_leaves": trial.suggest_int("num_leaves", **config.model_params.num_leaves),
@@ -144,6 +150,7 @@ def tune_LGBM(
 
     for train_idx, val_idx in splits.split(Xtrain, ytrain):
         X_train, y_train = Xtrain[train_idx], ytrain[train_idx]
+        # console.print(Xtrain.dtype, X_test.dtype)
         # if (Xtest is  None) and (ytest is None):
         X_val, y_val = Xtrain[val_idx], ytrain[val_idx]
         val_dataset = lgb.Dataset(X_val, label=y_val)
@@ -245,6 +252,7 @@ def main(conf: DictConfig):
     verify_path(conf.data.savedir)
 
     df = pl.read_ipc(conf.data.path)
+    console.log(f"Loaded data from [red]{conf.data.path}[/red]", justify="center")
 
     match conf.run_type:
         case "geno_only":
@@ -274,8 +282,8 @@ def main(conf: DictConfig):
 
     Xtrain = df.drop(
         ["Phenotype", "Condition", "Strain"],
-    ).to_numpy()
-    ytrain = df["Phenotype"].to_numpy()
+    ).to_numpy().astype(np.float64)
+    ytrain = df["Phenotype"].to_numpy().astype(np.float64) # Float 64 required for cuda in lightgbm
 
     # If no separate test set is given
     if conf.testing.test_dataset is None:
@@ -287,7 +295,7 @@ def main(conf: DictConfig):
         )
 
         Xtrain = StandardScaler().fit_transform(Xtrain)
-        Xtest = StandardScaler().fit_transform(Xtest)
+        Xtest = StandardScaler().fit_transform(Xtest)   # Float 64 required for cuda in lightgbm
 
     else:
         df = pl.read_ipc(conf.testing.test_dataset)
@@ -299,6 +307,8 @@ def main(conf: DictConfig):
 
         # Xtrain, ytrain = Xtrain, ytrain
 
+    console.log("Data processed", style="bold green", justify="center")
+    
     if conf.dummy.run:
         console.log("Creating DummyClassifier", style="bold red", justify="center")
 
