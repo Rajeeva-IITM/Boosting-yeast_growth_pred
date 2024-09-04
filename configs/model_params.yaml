@@ -6,8 +6,8 @@ model_params:
   early_stopping_rounds: 10
   num_threads: ${oc.env:NUM_THREADS} # Number of threads to use, from .env file
   boosting_type: gbdt # gbdt, dart, rf
-  device_type: cuda
-  gpu_use_dp: true
+  device_type: cpu
+  gpu_use_dp: false
   # seed: ${seed}
   # Parameters to tune
   lambda_l1:
