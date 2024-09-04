@@ -107,13 +107,9 @@ def tune_LGBM(
         "early_stopping_rounds": config.model_params.early_stopping_rounds,
         "num_threads": config.model_params.num_threads,
         "boosting_type": config.model_params.boosting_type,
-        
         "device_type": config.model_params.device_type,
         "gpu_use_dp": config.model_params.gpu_use_dp,
-        
         "seed": config.seed,
-        
-        
         "lambda_l1": trial.suggest_float("lambda_l1", **config.model_params.lambda_l1),
         "lambda_l2": trial.suggest_float("lambda_l2", **config.model_params.lambda_l2),
         "num_leaves": trial.suggest_int("num_leaves", **config.model_params.num_leaves),
@@ -280,10 +276,16 @@ def main(conf: DictConfig):
                 "Invalid run_type. Must be one of ['geno_only', 'chem_only', 'full']"
             )
 
-    Xtrain = df.drop(
-        ["Phenotype", "Condition", "Strain"],
-    ).to_numpy().astype(np.float64)
-    ytrain = df["Phenotype"].to_numpy().astype(np.float64) # Float 64 required for cuda in lightgbm
+    Xtrain = (
+        df.drop(
+            ["Phenotype", "Condition", "Strain"],
+        )
+        .to_numpy()
+        .astype(np.float64)
+    )
+    ytrain = (
+        df["Phenotype"].to_numpy().astype(np.float64)
+    )  # Float 64 required for cuda in lightgbm
 
     # If no separate test set is given
     if conf.testing.test_dataset is None:
@@ -295,7 +297,9 @@ def main(conf: DictConfig):
         )
 
         Xtrain = StandardScaler().fit_transform(Xtrain)
-        Xtest = StandardScaler().fit_transform(Xtest)   # Float 64 required for cuda in lightgbm
+        Xtest = StandardScaler().fit_transform(
+            Xtest
+        )  # Float 64 required for cuda in lightgbm
 
     else:
         df = pl.read_ipc(conf.testing.test_dataset)
@@ -308,7 +312,7 @@ def main(conf: DictConfig):
         # Xtrain, ytrain = Xtrain, ytrain
 
     console.log("Data processed", style="bold green", justify="center")
-    
+
     if conf.dummy.run:
         console.log("Creating DummyClassifier", style="bold red", justify="center")
 
