@@ -26,8 +26,8 @@ console = Console(record=True)
 logger = logging.getLogger()
 logger.addHandler(RichHandler(console=console))
 
-# optuna.logging.enable_propagation()  # Propagate logs to the root logger.
-# optuna.logging.disable_default_handler()  # Stop showing logs in sys.stderr.
+optuna.logging.disable_default_handler()  # Stop showing logs in sys.stderr.
+optuna.logging.enable_propagation()  # Propagate logs to the root logger.
 
 
 def create_dummy(
