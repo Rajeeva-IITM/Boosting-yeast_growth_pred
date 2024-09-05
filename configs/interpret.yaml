@@ -1,0 +1,29 @@
+run_path: ${oc.env:RUN_DIR}/regression
+out_path: ${oc.env:ROOT_DIR}/boosting/results/shap_regression
+data_path: ${oc.env:DATA_DIR}/regression_data/new_latent
+
+run_type: full # Must be one of full, geno_only, chem_only, dummy
+
+explainer:
+  _target_: shap.TreeExplainer
+
+# These are for getting the model from different directories
+# The structure is {run_path}/{prefix}{model_name}*{suffix}/{model_type}.pkl
+model_load_keys:
+  run_path: ${run_path}
+  model_type: Boosting # Must be one of Boosting, RandomForest, SVM, LogReg
+  prefix: Full_
+  suffix: ${run_type}
+  model_names:
+    - Bloom2013
+    # - Bloom2015
+    # - Bloom2019
+    # - Bloom2019_BYxM22
+    # - Bloom2019_RMxYPS163
+
+data_paths:
+  Bloom2013: ${data_path}/bloom2013_regression_std.feather
+  Bloom2015: ${data_path}/bloom2015_regression_std.feather
+  Bloom2019: ${data_path}/bloom2019_regression_std.feather
+  Bloom2019_BYxM22: ${data_path}/bloom2019_BYxM22_regression_std.feather
+  Bloom2019_RMxYPS163: ${data_path}/carbons_bloom2019_RMxYPS163_clf_3_pubchem.feather

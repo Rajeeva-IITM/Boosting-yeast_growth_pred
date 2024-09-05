@@ -1,23 +1,19 @@
 # Compare performance of any two model
 
-import pickle
-
-# from os import listdir
 from pathlib import Path
 from typing import Union
-from dotenv import load_dotenv
 
 import hydra
 import numpy as np
-from omegaconf import DictConfig
 import polars as pl
 import polars.selectors as cs
+from dotenv import load_dotenv
+from omegaconf import DictConfig
 from rich import print
 
 # import lightgbm as lgb
 from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef, roc_auc_score
-
-from typing import Dict, List
+from utils import get_model, get_model_paths
 
 load_dotenv()
 
@@ -35,7 +31,7 @@ def get_preds(
         pl.DataFrame: A DataFrame containing the actual Phenotype, predicted Phenotype, and Condition.
     """
     # print("We got here!")
-    model = pickle.load(open(path_of_model, "rb"))
+    model = get_model(path_of_model)
     data = pl.read_ipc(data_path)
 
     match run_type:
@@ -104,35 +100,6 @@ def eval_model(pred_df: pl.DataFrame) -> pl.DataFrame:
     return result_df
 
 
-def get_model_paths(
-    run_path: str, model_type: str, suffix: str, prefix: str, model_names: List[str]
-) -> Dict[str, List[Path]]:
-    """Retrieves the paths of the models in a given directory based on the provided model type and
-    suffix.
-
-    Parameters:
-        run_path (str): The directory containing the models.
-        model_type (str): The type of model to retrieve (e.g. lgbm, dummy).
-        suffix (str): The suffix of the model (e.g. full, geno_only, chem_only, dummy).
-        prefix (str): The prefix of the model paths (e.g. Bloom2013_).
-        model_names (List[str]): The list of models to retrieve.
-
-    Returns:
-        Dict[str, List[Path]]: A dictionary with the model names as keys and the
-            paths to the models as values.
-    """
-    # suffix = "" if suffix == "full" else suffix
-
-    run_path = Path(run_path)
-
-    model_paths = {
-        model: list(run_path.glob(f"{prefix}{model}*{suffix}/{model_type}.pkl"))
-        for model in model_names
-    }
-
-    return model_paths
-
-
 def get_results(conf: DictConfig):
     """Runs the models in the `run_path` directory on the data in the `data_paths` dictionary, and
     saves the results to the `out_path` directory.
@@ -169,8 +136,8 @@ def get_results(conf: DictConfig):
             result_df = get_preds_kfold(model_path, data_path, conf.run_type)
             metric_df = eval_model(result_df)
 
-            result_df.write_csv(
-                out_path / f"predictions_{model_name}_{data_name}_{model_type}.csv"
+            result_df.write_parquet(
+                out_path / f"predictions_{model_name}_{data_name}_{model_type}.parquet"
             )
 
             metric_df.write_csv(
