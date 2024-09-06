@@ -12,7 +12,7 @@ from omegaconf import DictConfig
 from rich import print
 
 # import lightgbm as lgb
-from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef, roc_auc_score
+# from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef, roc_auc_score
 from utils import get_model, get_model_paths
 
 load_dotenv()
@@ -46,7 +46,7 @@ def get_preds(
     y = data["Phenotype"].to_numpy()
 
     preds = model.predict(X)
-    preds = np.where(preds > 0.5, 1, 0)
+    # preds = np.where(preds > 0.5, 1, 0)
 
     return pl.DataFrame(
         {"Phenotype": y, "Preds": preds, "Condition": data["Condition"]}
@@ -73,10 +73,11 @@ def get_preds_kfold(
     return pl.concat(preds)
 
 
-def eval_model(pred_df: pl.DataFrame) -> pl.DataFrame:
+def eval_model(conf: DictConfig, pred_df: pl.DataFrame) -> pl.DataFrame:
     """Evaluates the performance of a model based on its predictions.
 
     Parameters:
+        conf (DictConfig): A configuration object with the relevant metrics
         pred_df (pl.DataFrame): A DataFrame containing the predicted values,
             actual values, and conditions.
 
@@ -84,15 +85,20 @@ def eval_model(pred_df: pl.DataFrame) -> pl.DataFrame:
         pl.DataFrame: A DataFrame containing the accuracy, f1 score, auc roc score,
             and mathews correlation coefficient for each condition and fold.
     """
+    
+    # for metric in conf.metrics:
+    
     result_df = pred_df.group_by("Condition", "Fold", maintain_order=True).map_groups(
         lambda x: pl.DataFrame(
             {
                 "Condition": x["Condition"].unique(maintain_order=True),
                 "Fold": x["Fold"].unique(maintain_order=True),
-                "accuracy": accuracy_score(x["Phenotype"], x["Preds"]),
-                "f1": f1_score(x["Phenotype"], x["Preds"]),
-                "auc_roc": roc_auc_score(x["Phenotype"], x["Preds"]),
-                "mathews": matthews_corrcoef(x["Phenotype"], x["Preds"]),
+                # "accuracy": accuracy_score(x["Phenotype"], x["Preds"]),
+                # "f1": f1_score(x["Phenotype"], x["Preds"]),
+                # "auc_roc": roc_auc_score(x["Phenotype"], x["Preds"]),
+                # "mathews": matthews_corrcoef(x["Phenotype"], x["Preds"]),
+            } | {
+                metric: hydra.utils.call(conf.metrics.get(metric), x["Phenotype"], x["Preds"]) for metric in conf.metrics
             }
         )
     )
@@ -134,7 +140,7 @@ def get_results(conf: DictConfig):
         for data_name, data_path in conf.data_paths.items():
             print(model_name, data_name)
             result_df = get_preds_kfold(model_path, data_path, conf.run_type)
-            metric_df = eval_model(result_df)
+            metric_df = eval_model(conf, result_df)
 
             result_df.write_parquet(
                 out_path / f"predictions_{model_name}_{data_name}_{model_type}.parquet"

@@ -1,26 +1,34 @@
 run_path: ${oc.env:RUN_DIR}/chem_subsets/Final
-out_path: ${oc.env:ROOT_DIR}/boosting/performance/Final
-data_path: ${oc.env:DATA_DIR}/chem_subsets/new_latent/carbons
+out_path: ${oc.env:PROJECT_DIR}/performance/regression/full
+data_path: ${oc.env:DATA_DIR}/regression_data/new_latent
 
 run_type: full # Must be one of full, geno_only, chem_only, dummy
+
+metrics:
+  r2_score:
+    _target_: sklearn.metrics.r2_score
+  mean_squared_error:
+    _target_: sklearn.metrics.mean_squared_error
+  # Correlation:
+  #   _target_: sklearn.metrics.pearsonr
 
 # These are for getting the model from different directories
 # The structure is {run_path}/{prefix}{model_name}*{suffix}/{model_type}.pkl
 model_load_keys:
   run_path: ${run_path}
   model_type: Boosting # Must be one of Boosting, RandomForest, SVM, LogReg
-  prefix: Carbons_
+  prefix: Full
   suffix: ${run_type}
   model_names:
     - Bloom2013
-    - Bloom2015
-    - Bloom2019
+    # - Bloom2015
+    - Bloom2019_BYxRM
     - Bloom2019_BYxM22
-    - Bloom2019_RMxYPS163
+    # - Bloom2019_RMxYPS163
 
 data_paths:
-  Bloom2013: ${data_path}/carbons_bloom2013_clf_3_pubchem.feather
-  Bloom2015: ${data_path}/carbons_bloom2015_clf_3_pubchem.feather
-  Bloom2019: ${data_path}/carbons_bloom2019_clf_3_pubchem.feather
-  Bloom2019_BYxM22: ${data_path}/carbons_bloom2019_BYxM22_clf_3_pubchem.feather
-  Bloom2019_RMxYPS163: ${data_path}/carbons_bloom2019_RMxYPS163_clf_3_pubchem.feather
+  Bloom2013: ${data_path}/bloom2013_regression_std.feather
+  # Bloom2015: ${data_path}/bloom2015_regression_std.feather
+  Bloom2019_BYxRM: ${data_path}/bloom2019_regression_std.feather
+  Bloom2019_BYxM22: ${data_path}/bloom2019_BYxM22_regression_std.feather
+  # Bloom2019_RMxYPS163: ${data_path}/carbons_bloom2019_RMxYPS163_clf_3_pubchem.feather

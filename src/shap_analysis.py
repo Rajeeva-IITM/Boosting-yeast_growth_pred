@@ -38,14 +38,14 @@ def get_shap_values(
     explainer = hydra.utils.instantiate(conf.explainer, model, X)
 
     # compute shap values
-    shap_values = explainer.shap_values(X, y)
-    shap_df = pl.DataFrame(data=shap_values, schema=X.columns)
+    shap_values = explainer.shap_values(X, y, approximate=True)
+    shap_df = pl.DataFrame(data=shap_values, schema=X.columns.to_list())
     shap_mean = (
         shap_df.with_columns(pl.all().abs().mean())
         .unique()
         .melt()
         .with_columns(Fold=pl.lit(fold))
-        .rename({"value": "Value", "variable": "Feature"}, axis=1)
+        .rename({"value": "Value", "variable": "Feature"})
         .sort("Value", descending=True)
     )
 
@@ -75,6 +75,7 @@ def get_shap_folds(
     """
     df_folds = []
     for fold, model_path in enumerate(model_paths):
+        print(f"Fold: {fold}")
         df_fold = get_shap_values(conf, model_path, data_path, fold)
         df_folds.append(df_fold)
 

@@ -364,13 +364,17 @@ def main(conf: DictConfig):
     n_estimators = best_params.pop("n_estimators")
 
     constant_params = {  # These parameters won't change regardless of the trial and model
-        "n_estimators": n_estimators,
-        "objective": "binary",
-        "verbosity": -10,
-        "force_col_wise": True,
-        "early_stopping_rounds": 10,
+        "objective": conf.model_params.objective,
+        "verbosity": conf.model_params.verbosity,
+        "force_col_wise": conf.model_params.force_col_wise,
+        "early_stopping_rounds": conf.model_params.early_stopping_rounds,
+        "num_threads": conf.model_params.num_threads,
+        "boosting_type": conf.model_params.boosting_type,
+        "device_type": conf.model_params.device_type,
+        "gpu_use_dp": conf.model_params.gpu_use_dp,
+        "seed": conf.seed,
     }
-
+    
     model = lgb.train(
         best_params | constant_params,
         lgb.Dataset(Xtrain, label=ytrain),
