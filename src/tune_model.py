@@ -20,6 +20,7 @@ from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import StandardScaler
 
 from utils import get_data
+from train import train_booster
 
 load_dotenv()
 
@@ -320,28 +321,9 @@ def main(conf: DictConfig):
 
     console.print(f"Best parameters: {best_params}", justify="center")
 
-    n_estimators = best_params.pop("n_estimators")
 
-    constant_params = {  # These parameters won't change regardless of the trial and model
-        "objective": conf.model_params.objective,
-        "verbosity": conf.model_params.verbosity,
-        "force_col_wise": conf.model_params.force_col_wise,
-        "early_stopping_rounds": conf.model_params.early_stopping_rounds,
-        "num_threads": conf.model_params.num_threads,
-        "boosting_type": conf.model_params.boosting_type,
-        "device_type": conf.model_params.device_type,
-        "gpu_use_dp": conf.model_params.gpu_use_dp,
-        "seed": conf.seed,
-    }
+    model = train_booster(conf, best_params, Xtrain, ytrain, Xtest, ytest)
     
-    model = lgb.train(
-        best_params | constant_params,
-        lgb.Dataset(Xtrain, label=ytrain),
-        num_boost_round=n_estimators,
-        valid_sets=[lgb.Dataset(Xtest, label=ytest)],
-        # verbose_eval=False
-    )
-
     with open(conf.data.savedir + f"/{study_name}.pkl", "wb") as f:
         pickle.dump(model, f)
 
