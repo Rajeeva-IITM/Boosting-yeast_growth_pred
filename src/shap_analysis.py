@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import List
 from dotenv import load_dotenv
 import hydra
 import polars as pl
@@ -53,7 +54,7 @@ def get_shap_values(
 
 
 def get_shap_folds(
-    conf: DictConfig, model_paths: Path, data_path: Path
+    conf: DictConfig, model_paths: List[Path], data_path: Path
 ) -> pl.DataFrame:
     """Compute SHAP values for multiple models from the same dataset and concatenate them. Useful
     for when when you have models trained on different folds of the underlying data.

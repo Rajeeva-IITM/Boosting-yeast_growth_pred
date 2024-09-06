@@ -1,5 +1,6 @@
 defaults:
   - model_params
+  - utilities
   - _self_
 
 data:
@@ -24,7 +25,6 @@ testing:
   test_frac: 0.2 # fraction of data to use for testing,
   #Not considered if a separate test dataset is provided
 
-run_type: full # one of full, geno_only, chem_only,
 
 dummy: # for creating baseline models
   run: false # When false we don't care

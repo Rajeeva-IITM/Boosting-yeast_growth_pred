@@ -19,6 +19,8 @@ from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import StandardScaler
 
+from utils import get_data
+
 load_dotenv()
 
 console = Console(record=True)
@@ -247,45 +249,7 @@ def main(conf: DictConfig):
 
     verify_path(conf.data.savedir)
 
-    df = pl.read_ipc(conf.data.path)
-    console.log(f"Loaded data from [red]{conf.data.path}[/red]", justify="center")
-
-    match conf.run_type:
-        case "geno_only":
-            df = df.select(
-                pl.col("Strain"),
-                cs.starts_with(
-                    "Y"
-                ),  # Only the genotype columns, based on yeast systemic names # TODO: Hardcoded for now. But should be flexible
-                pl.col("Condition"),
-                pl.col("Phenotype"),
-            )
-        case "chem_only":
-            df = df.select(
-                pl.col("Strain"),
-                cs.contains(
-                    "latent"
-                ),  # Only the chemical information # TODO: Hardcoded for now. But should be flexible
-                pl.col("Condition"),
-                pl.col("Phenotype"),
-            )
-        case "full":
-            pass
-        case _:
-            raise ValueError(
-                "Invalid run_type. Must be one of ['geno_only', 'chem_only', 'full']"
-            )
-
-    Xtrain = (
-        df.drop(
-            ["Phenotype", "Condition", "Strain"],
-        )
-        .to_numpy()
-        .astype(np.float64)
-    )
-    ytrain = (
-        df["Phenotype"].to_numpy().astype(np.float64)
-    )  # Float 64 required for cuda in lightgbm
+    Xtrain, ytrain = get_data(conf.data_path, run_type=conf.run_type, return_as_Xy=True)
 
     # If no separate test set is given
     if conf.testing.test_dataset is None:
@@ -299,17 +263,12 @@ def main(conf: DictConfig):
         Xtrain = StandardScaler().fit_transform(Xtrain)
         Xtest = StandardScaler().fit_transform(
             Xtest
-        )  # Float 64 required for cuda in lightgbm
+        )  
 
     else:
-        df = pl.read_ipc(conf.testing.test_dataset)
-        Xtest = df.drop(
-            ["Phenotype", "Condition", "Strain"],
-        ).to_numpy()
-        ytest = df["Phenotype"].to_numpy()
-        Xtest = StandardScaler().fit_transform(Xtest)
+        Xtest, ytest = get_data(conf.testing.test_dataset, run_type=conf.run_type, return_as_Xy=True)
+        Xtest = StandardScaler().fit_transform(Xtest) # type: ignore
 
-        # Xtrain, ytrain = Xtrain, ytrain
 
     console.log("Data processed", style="bold green", justify="center")
 
