@@ -250,7 +250,7 @@ def main(conf: DictConfig):
 
     verify_path(conf.data.savedir)
 
-    Xtrain, ytrain = get_data(conf.data_path, run_type=conf.run_type, return_as_Xy=True)
+    Xtrain, ytrain = get_data(conf.data.path, run_type=conf.run_type, return_as_Xy=True)
 
     # If no separate test set is given
     if conf.testing.test_dataset is None:
