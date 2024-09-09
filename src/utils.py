@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import Dict, List, Union, Tuple, Any
 from numpy import ndarray
 
+from scipy.stats import pearsonr, spearmanr
+
+# Getting stuff
 def get_data(data_path: Union[Path, str], run_type: str, return_as_Xy: bool=False) -> Union[pl.DataFrame, Tuple[ndarray[Any, Any], ndarray[Any, Any]]]:
     """Loads the data from a given path and returns it as a DataFrame.
 
@@ -144,3 +147,16 @@ def get_model_paths(
     }
 
     return model_paths
+
+
+# Metric Stuff 
+## Need this specifically correlation because native scipy pearsonr gives both the correlation and p-value which doesn't sit well when creating dataframes
+
+def get_corr(preds: ndarray, ytest: ndarray, method: str) -> float:
+    match method:
+        case "pearson":
+            return pearsonr(preds, ytest).statistic
+        case "spearman":
+            return spearmanr(preds, ytest).statistic
+        case _:
+            raise ValueError("Invalid method. Must be one of ['pearson', 'spearman']")

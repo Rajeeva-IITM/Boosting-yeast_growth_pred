@@ -9,8 +9,6 @@ import hydra
 import lightgbm as lgb
 import numpy as np
 import optuna
-import polars as pl
-import polars.selectors as cs
 from dotenv import load_dotenv
 from omegaconf import DictConfig
 from rich.console import Console
@@ -18,9 +16,8 @@ from rich.logging import RichHandler
 from sklearn.dummy import DummyClassifier
 from sklearn.model_selection import KFold, train_test_split
 from sklearn.preprocessing import StandardScaler
-
-from utils import get_data
 from train import train_booster
+from utils import get_data
 
 load_dotenv()
 

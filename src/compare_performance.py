@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Union
 
 import hydra
-import numpy as np
 import polars as pl
 import polars.selectors as cs
 from dotenv import load_dotenv
@@ -85,8 +84,6 @@ def eval_model(conf: DictConfig, pred_df: pl.DataFrame) -> pl.DataFrame:
         pl.DataFrame: A DataFrame containing the accuracy, f1 score, auc roc score,
             and mathews correlation coefficient for each condition and fold.
     """
-    
-    # for metric in conf.metrics:
     
     result_df = pred_df.group_by("Condition", "Fold", maintain_order=True).map_groups(
         lambda x: pl.DataFrame(
