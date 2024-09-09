@@ -2,7 +2,7 @@
 
 #the next few commands are required only for actinium
 export PATH=$PATH:/home/rajeeva/.local/bin/
-cd /data/rajeeva/Boosting-yeast_growth_pred/
+cd /data/rajeeva/Boosting-yeast_growth_pred/ || exit
 # micromamba activate boost_env
 export PYTHON=~/micromamba/envs/boost_env/bin/python
 

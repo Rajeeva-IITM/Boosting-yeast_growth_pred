@@ -259,14 +259,13 @@ def main(conf: DictConfig):
         )
 
         Xtrain = StandardScaler().fit_transform(Xtrain)
-        Xtest = StandardScaler().fit_transform(
-            Xtest
-        )  
+        Xtest = StandardScaler().fit_transform(Xtest)
 
     else:
-        Xtest, ytest = get_data(conf.testing.test_dataset, run_type=conf.run_type, return_as_Xy=True)
-        Xtest = StandardScaler().fit_transform(Xtest) # type: ignore
-
+        Xtest, ytest = get_data(
+            conf.testing.test_dataset, run_type=conf.run_type, return_as_Xy=True
+        )
+        Xtest = StandardScaler().fit_transform(Xtest)  # type: ignore
 
     console.log("Data processed", style="bold green", justify="center")
 
@@ -318,9 +317,8 @@ def main(conf: DictConfig):
 
     console.print(f"Best parameters: {best_params}", justify="center")
 
-
     model = train_booster(conf, best_params, Xtrain, ytrain, Xtest, ytest)
-    
+
     with open(conf.data.savedir + f"/{study_name}.pkl", "wb") as f:
         pickle.dump(model, f)
 

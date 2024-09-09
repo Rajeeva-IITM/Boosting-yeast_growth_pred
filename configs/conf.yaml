@@ -25,7 +25,6 @@ testing:
   test_frac: 0.2 # fraction of data to use for testing,
   #Not considered if a separate test dataset is provided
 
-
 dummy: # for creating baseline models
   run: false # When false we don't care
   strategy: stratified # strategy compatible with sklearn.dummy.DummyClassifier

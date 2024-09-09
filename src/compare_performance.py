@@ -84,7 +84,7 @@ def eval_model(conf: DictConfig, pred_df: pl.DataFrame) -> pl.DataFrame:
         pl.DataFrame: A DataFrame containing the accuracy, f1 score, auc roc score,
             and mathews correlation coefficient for each condition and fold.
     """
-    
+
     result_df = pred_df.group_by("Condition", "Fold", maintain_order=True).map_groups(
         lambda x: pl.DataFrame(
             {
@@ -94,8 +94,12 @@ def eval_model(conf: DictConfig, pred_df: pl.DataFrame) -> pl.DataFrame:
                 # "f1": f1_score(x["Phenotype"], x["Preds"]),
                 # "auc_roc": roc_auc_score(x["Phenotype"], x["Preds"]),
                 # "mathews": matthews_corrcoef(x["Phenotype"], x["Preds"]),
-            } | {
-                metric: hydra.utils.call(conf.metrics.get(metric), x["Phenotype"], x["Preds"]) for metric in conf.metrics
+            }
+            | {
+                metric: hydra.utils.call(
+                    conf.metrics.get(metric), x["Phenotype"], x["Preds"]
+                )
+                for metric in conf.metrics
             }
         )
     )

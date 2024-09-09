@@ -10,4 +10,3 @@ run_type: full # Must be one of full, geno_only, chem_only, dummy
 
 explainer:
   _target_: shap.TreeExplainer
-
