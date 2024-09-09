@@ -1,6 +1,6 @@
 model_params:
   # Unchanging parameters
-  objective: binary
+  objective: binary # or mse
   verbosity: -10
   force_col_wise: true
   early_stopping_rounds: 10

@@ -131,7 +131,7 @@ def get_results(conf: DictConfig):
     model_paths = get_model_paths(**conf.model_load_keys)
 
     assert (
-        len(conf.model_load_keys.model_names) == len(conf.data_paths)
+        len(conf.model_load_keys.model_names) <= len(conf.data_paths)
     ), f"Mismatch between data {len(conf.data_paths)} and model {len(conf.model_load_keys.model_names)} and model names"
 
     print(model_paths)

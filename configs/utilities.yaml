@@ -14,16 +14,16 @@ model_load_keys:
   prefix: Full_
   suffix: ${run_type}
   model_names:
-    # - Bloom2013
-    - Bloom2015
-    # - Bloom2019_BYxRM
-    # - Bloom2019_BYxM22
+    - Bloom2013
+    # - Bloom2015
+    - Bloom2019_BYxRM
+    - Bloom2019_BYxM22
     # - Bloom2019_RMxYPS163
 
 # Paths to data
 data_paths:
-  # Bloom2013: ${data_path}/bloom2013_regression_std.feather
+  Bloom2013: ${data_path}/bloom2013_regression_std.feather
   Bloom2015: ${data_path}/bloom2015_regression_std.feather
-  # Bloom2019_BYxRM: ${data_path}/bloom2019_regression_std.feather
-  # Bloom2019_BYxM22: ${data_path}/bloom2019_BYxM22_regression_std.feather
+  Bloom2019_BYxRM: ${data_path}/bloom2019_regression_std.feather
+  Bloom2019_BYxM22: ${data_path}/bloom2019_BYxM22_regression_std.feather
   # Bloom2019_RMxYPS163: ${data_path}/carbons_bloom2019_RMxYPS163_clf_3_pubchem.feather

@@ -46,18 +46,6 @@ def main(conf: DictConfig):
         else conf.models.RandomForest.name
     )
 
-    # Data processing
-    console.log("Processing data", style="bold red", justify="center")
-
-    Xtrain, ytrain = get_data(conf.data.path, run_type=conf.run_type, return_as_Xy=True)
-    Xtrain, Xtest, ytrain, ytest = train_test_split(
-        Xtrain, ytrain, test_size=conf.testing.test_frac, random_state=conf.seed
-    )
-
-    Xtrain = StandardScaler().fit_transform(Xtrain)
-    Xtest = StandardScaler().fit_transform(Xtest)
-    console.log("Data processed", style="bold green", justify="center")
-
     # locating params
     model_param_paths = get_model_paths(
         run_path=conf.model_load_keys.run_path,
@@ -70,10 +58,23 @@ def main(conf: DictConfig):
 
     # loading parameters
     for name, paths in model_param_paths.items():
+        
+        # Data processing
+        console.log("Processing data", style="bold red", justify="center")
+
+        Xtrain, ytrain = get_data(conf.data_paths.get(name), run_type=conf.run_type, return_as_Xy=True)
+        Xtrain, Xtest, ytrain, ytest = train_test_split(
+            Xtrain, ytrain, test_size=conf.testing.test_frac, random_state=conf.seed
+        )
+
+        Xtrain = StandardScaler().fit_transform(Xtrain)
+        Xtest = StandardScaler().fit_transform(Xtest)
+        console.log("Data processed", style="bold green", justify="center")
+            
         for model_param_path in paths:
             
             model_param_path = Path(model_param_path)
-            print(model_param_path)
+            console.print(model_param_path)
             
             with open(model_param_path, "rb") as f:
                 params = pickle.load(f)
