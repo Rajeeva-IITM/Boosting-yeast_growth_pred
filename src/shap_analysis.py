@@ -5,6 +5,7 @@ import hydra
 import polars as pl
 from rich import print
 from omegaconf import DictConfig
+from sklearn.preprocessing import StandardScaler
 from utils import get_model, get_model_paths
 
 load_dotenv()
@@ -33,13 +34,14 @@ def get_shap_values(
     model = get_model(model_path)
     data = pl.read_ipc(data_path)
     X = data.drop(["Condition", "Strain", "Phenotype"]).to_pandas()
+    X_std = StandardScaler().fit_transform(X)
     y = data["Phenotype"].to_numpy()
 
     # instantiate explainer
-    explainer = hydra.utils.instantiate(conf.explainer, model, X)
+    explainer = hydra.utils.instantiate(conf.explainer, model, X_std)
 
     # compute shap values
-    shap_values = explainer.shap_values(X, y, approximate=True)
+    shap_values = explainer.shap_values(X_std, y, approximate=True)
     shap_df = pl.DataFrame(data=shap_values, schema=X.columns.to_list())
     shap_mean = (
         shap_df.with_columns(pl.all().abs().mean())

@@ -5,14 +5,13 @@ from typing import Union
 
 import hydra
 import polars as pl
-import polars.selectors as cs
+
 from dotenv import load_dotenv
 from omegaconf import DictConfig
 from rich import print
 
-# import lightgbm as lgb
-# from sklearn.metrics import accuracy_score, f1_score, matthews_corrcoef, roc_auc_score
-from utils import get_model, get_model_paths
+from utils import get_model, get_model_paths, get_data
+from sklearn.preprocessing import StandardScaler
 
 load_dotenv()
 
@@ -34,16 +33,14 @@ def get_preds(
     data = pl.read_ipc(data_path)
 
     match run_type:
-        case "full":
-            X = data.drop(["Condition", "Strain", "Phenotype"]).to_pandas()
-        case "geno_only":
-            X = data.select(cs.starts_with("Y")).to_pandas()
-        case "chem_only":
-            X = data.select(cs.starts_with("latent")).to_pandas()
+        case "full" | "geno_only" | "chem_only":
+            X, y = get_data(data_path=data_path, run_type=run_type, return_as_Xy=True)
         case "dummy":
-            X = data.drop(["Condition", "Strain", "Phenotype"]).to_pandas()
-    y = data["Phenotype"].to_numpy()
+            X, y = get_data(
+                data_path=data_path, run_type="full", return_as_Xy=True
+            )  # dummy is the same as full, because it doesn't care about features
 
+    X = StandardScaler().fit_transform(X)
     preds = model.predict(X)
     # preds = np.where(preds > 0.5, 1, 0)
 
