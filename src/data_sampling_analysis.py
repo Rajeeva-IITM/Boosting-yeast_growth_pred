@@ -271,7 +271,7 @@ def tune_sampler(
         train_dataset = lgb.Dataset(sampled_X, sampled_y, free_raw_data=False)
 
         model_params = {
-            "objective": "binary",
+            "objective": config.model.objective,
             "verbose": -10,
             "early_stopping_rounds": 10,
             "lambda_l1": config.model.lambda_l1,
@@ -282,7 +282,7 @@ def tune_sampler(
             "bagging_freq": config.model.bagging_freq,
             "min_child_samples": config.model.min_child_samples,
             "learning_rate": config.model.learning_rate,
-            "metrics": ["binary_logloss", "auc"],
+            "metrics": config.model.metrics,
             "random_seed": i
             if not config.model.seed
             else config.model.seed,  # Change seed every iteration
@@ -299,7 +299,9 @@ def tune_sampler(
             # feval=eval_metric
         )
 
-        score = model.best_score["valid_0"]["auc"]
+        # console.print(model.best_score["valid_0"])
+
+        score = model.best_score["valid_0"][config.model.metrics]
 
         scores.append(score)
 
@@ -321,7 +323,7 @@ def verify_path(path: str):
         console.print(f"Created directory at [red]{path}[/red]", justify="center")
 
 
-@hydra.main(version_base=None, config_path="./configs/", config_name="sampler_conf")
+@hydra.main(version_base=None, config_path="../configs/", config_name="sampler_conf")
 def main(conf: DictConfig):
     """Main function to run the hyperparameter tuning for the sampler.
 
@@ -346,7 +348,7 @@ def main(conf: DictConfig):
     sampler_study = optuna.create_study(
         storage=storage,
         study_name="sampler_study",
-        directions=["minimize", "maximize"],
+        directions=conf.study_directions,
         pruner=optuna.pruners.HyperbandPruner(),
         sampler=optuna.samplers.TPESampler(),
         load_if_exists=True,
