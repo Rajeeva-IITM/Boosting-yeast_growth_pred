@@ -6,7 +6,7 @@ data:
 
 n_trials: 200
 seed: 42
-repeat_num: 50
+repeat_num: 10
 
 repeat_samples: true
 
@@ -22,6 +22,7 @@ model:
   feature_fraction: 0.8
   bagging_fraction: 0.8
   bagging_freq: 5
+  num_threads: ${oc.env:NUM_THREADS} # Number of threads to use, from .env file
   min_child_samples: 20
   learning_rate: 0.1
   n_estimators: 500

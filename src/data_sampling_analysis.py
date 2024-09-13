@@ -237,6 +237,7 @@ def tune_sampler(
         test_df.drop(["Condition", "Strain", "Phenotype"]).to_numpy(),
         test_df["Phenotype"].to_numpy(),
     )
+    X_test = StandardScaler().fit_transform(X_test)
     val_dataset = lgb.Dataset(X_test, y_test, free_raw_data=False)
 
     max_samples = train_df.shape[0]  # Max should be # of the training samples
