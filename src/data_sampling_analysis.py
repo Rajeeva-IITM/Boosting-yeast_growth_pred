@@ -231,7 +231,7 @@ def tune_sampler(
     n_samples : int
         The optimal number of samples.
     mean_score : float
-        The mean AUC score over the cross-validation folds.
+        The mean score over the cross-validation folds.
     """
     X_test, y_test = (
         test_df.drop(["Condition", "Strain", "Phenotype"]).to_numpy(),
@@ -272,24 +272,24 @@ def tune_sampler(
         train_dataset = lgb.Dataset(sampled_X, sampled_y, free_raw_data=False)
 
         model_params = {
-            "objective": config.model.objective,
+            "objective": config.model_params.objective,
             "verbose": -10,
             "early_stopping_rounds": 10,
-            "lambda_l1": config.model.lambda_l1,
-            "lambda_l2": config.model.lambda_l2,
-            "num_leaves": config.model.num_leaves,
-            "feature_fraction": config.model.feature_fraction,
-            "bagging_fraction": config.model.bagging_fraction,
-            "bagging_freq": config.model.bagging_freq,
-            "min_child_samples": config.model.min_child_samples,
-            "learning_rate": config.model.learning_rate,
-            "metrics": config.model.metrics,
+            "lambda_l1": config.model_params.lambda_l1,
+            "lambda_l2": config.model_params.lambda_l2,
+            "num_leaves": config.model_params.num_leaves,
+            "feature_fraction": config.model_params.feature_fraction,
+            "bagging_fraction": config.model_params.bagging_fraction,
+            "bagging_freq": config.model_params.bagging_freq,
+            "min_child_samples": config.model_params.min_child_samples,
+            "learning_rate": config.model_params.learning_rate,
+            "metrics": config.model_params.metrics,
             "random_seed": i
-            if not config.model.seed
-            else config.model.seed,  # Change seed every iteration
+            if not config.model_params.seed
+            else config.model_params.seed,  # Change seed every iteration
         }
 
-        n_estimators = config.model.n_estimators
+        n_estimators = config.model_params.n_estimators
 
         model = lgb.train(
             params=model_params,
@@ -302,7 +302,7 @@ def tune_sampler(
 
         # console.print(model.best_score["valid_0"])
 
-        score = model.best_score["valid_0"][config.model.metrics]
+        score = model.best_score["valid_0"][config.model_params.metrics]
 
         scores.append(score)
 

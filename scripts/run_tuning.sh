@@ -2,8 +2,8 @@
 
 # cd /home/rajeeva/Project/boosting/
 
-export train_data='${oc.env:DATA_DIR}/regression_data/new_latent/bloom2013_regression_std.feather'
-export train_name=Bloom2013
+export train_data='${oc.env:DATA_DIR}/regression_data/new_latent/bloom2019_regression_std.feather'
+export train_name=Bloom2019_BYxRM
 export prefix="Full_"
 export suffix="robust_samples"
 export extra_params='data.savedir=${oc.env:RUN_DIR}/regression_sampling/${data.savename}/'

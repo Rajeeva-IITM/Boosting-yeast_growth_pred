@@ -90,6 +90,8 @@ repos:
         args: [
             "-e",
             "SC2016", # Hydra uses a lot of $ commands.
+            "-e",
+            "SC2086",
           ]
 
   # md formatting

@@ -14,7 +14,7 @@ study_directions:
   - minimize
   - minimize
 
-model:
+model_params:
   objective: mse
   lambda_l1: 0.001
   lambda_l2: 0.001
