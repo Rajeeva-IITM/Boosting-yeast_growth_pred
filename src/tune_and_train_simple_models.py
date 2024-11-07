@@ -419,7 +419,7 @@ def main(conf: DictConfig):
             conf=conf,
             X=Xtrain,
             y=ytrain,
-            n_jobs=25,  # Carefully use this parameter. Avoid when using multithreaded algorithms
+            n_jobs=5,  # Carefully use this parameter. Avoid when using multithreaded algorithms
         )
 
         # Train best model
@@ -457,7 +457,7 @@ def main(conf: DictConfig):
             conf=conf,
             X=Xtrain,
             y=ytrain,
-            n_jobs=20,
+            n_jobs=5,
         )
 
         # Train best model
