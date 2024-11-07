@@ -3,6 +3,7 @@
 from pathlib import Path
 from typing import Union
 
+import numpy as np
 import hydra
 import polars as pl
 
@@ -17,13 +18,18 @@ load_dotenv()
 
 
 def get_preds(
-    path_of_model: Union[str, Path], data_path: Union[str, Path], run_type: str
+    path_of_model: Union[str, Path],
+    data_path: Union[str, Path],
+    run_type: str,
+    regression: bool,
 ) -> pl.DataFrame:
     """A function that generates predictions using a trained model.
 
     Parameters:
         model_path (str): Path to the trained model file.
         data_path (str): Path to the data file for prediction.
+        run_type (str): One of `full`, `geno_only`, `chem_only`
+        regression (bool): Whether the model is regression or classification
 
     Returns:
         pl.DataFrame: A DataFrame containing the actual Phenotype, predicted Phenotype, and Condition.
@@ -42,7 +48,9 @@ def get_preds(
 
     X = StandardScaler().fit_transform(X)
     preds = model.predict(X)
-    # preds = np.where(preds > 0.5, 1, 0)
+
+    if not regression:
+        preds = np.where(preds > 0.5, 1, 0)
 
     return pl.DataFrame(
         {"Phenotype": y, "Preds": preds, "Condition": data["Condition"]}
@@ -50,20 +58,22 @@ def get_preds(
 
 
 def get_preds_kfold(
-    paths_of_model: Union[str, Path.glob], data_path, run_type
+    paths_of_model: Union[str, Path.glob], data_path, run_type, regression: bool
 ) -> pl.DataFrame:
     """A function that generates predictions using a trained model.
 
     Parameters:
         paths_of_model (str): Path to the trained model file.
         data_path (str): Path to the data file for prediction.
+        run_type (str): One of `full`, `geno_only`, `chem_only`
+        regression (bool): Whether the model is regression or classification
 
     Returns:
         pl.DataFrame: A DataFrame containing the actual Phenotype, predicted Phenotype, and Condition.
     """
     preds = []
     for i, path_of_model in enumerate(paths_of_model):
-        result = get_preds(path_of_model, data_path, run_type)
+        result = get_preds(path_of_model, data_path, run_type, regression)
         result = result.with_columns(pl.lit(i).alias("Fold"))
         preds.append(result)
     return pl.concat(preds)
@@ -118,6 +128,7 @@ def get_results(conf: DictConfig):
                 - model_types (List[str]): A list of model types to run.
                 - run_type (str): The suffix of the model name to distinguish between
                     different runs (e.g. 'full', 'geno_only', 'chem_only', 'dummy').
+                - regression (bool): Whether the model is regression or classification.
 
     Returns:
         None
@@ -137,7 +148,9 @@ def get_results(conf: DictConfig):
     for model_name, model_path in model_paths.items():
         for data_name, data_path in conf.data_paths.items():
             print(model_name, data_name)
-            result_df = get_preds_kfold(model_path, data_path, conf.run_type)
+            result_df = get_preds_kfold(
+                model_path, data_path, conf.run_type, conf.regression
+            )
             metric_df = eval_model(conf, result_df)
 
             result_df.write_parquet(

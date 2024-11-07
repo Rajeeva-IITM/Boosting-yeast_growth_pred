@@ -1,21 +1,10 @@
 defaults:
   - utilities
   - _self_
+  - metrics: reg # choose this appropriately based on the task_type
 
-run_path: ${oc.env:RUN_DIR}/chem_subsets/Final
-out_path: ${oc.env:PROJECT_DIR}/performance/regression/full
-data_path: ${oc.env:DATA_DIR}/regression_data/new_latent
+# run_path: ${oc.env:RUN_DIR}/chem_subsets/Final
+# out_path: ${oc.env:PROJECT_DIR}/performance/regression/full
+# data_path: ${oc.env:DATA_DIR}/regression_data/new_latent
 
-run_type: full # Must be one of full, geno_only, chem_only, dummy
-
-metrics:
-  r2_score:
-    _target_: sklearn.metrics.r2_score
-  mean_squared_error:
-    _target_: sklearn.metrics.mean_squared_error
-  pearson_correlation:
-    _target_: utils.get_corr # For some reason, src.utils.get_corr doesn't work. Probably because because this file is inside src/
-    method: pearson
-  spearman_correlation:
-    _target_: utils.get_corr
-    method: spearman
+# run_type: full # Must be one of full, geno_only, chem_only, dummy
