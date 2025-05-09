@@ -52,3 +52,23 @@ models:
   NeighboursR:
     name: NeighboursR
     model_savename: ${data.savedir}/${models.NeighboursR.name}.pkl
+
+  LDA:
+    name: LDA
+    model_savename: ${data.savedir}/${models.LDA.name}.pkl
+
+  QDA:
+    name: QDA
+    model_savename: ${data.savedir}/${models.QDA.name}.pkl
+
+  KNN:
+    name: KNN
+    model_savename: ${data.savedir}/${models.NN.name}.pkl
+
+  NB:
+    name: NB
+    model_savename: ${data.savedir}/${models.NB.name}.pkl
+
+  GP:
+    name: GP
+    model_savename: ${data.savedir}/${models.GP.name}.pkl
