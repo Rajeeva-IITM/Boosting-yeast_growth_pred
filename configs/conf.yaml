@@ -63,7 +63,7 @@ models:
 
   KNN:
     name: KNN
-    model_savename: ${data.savedir}/${models.NN.name}.pkl
+    model_savename: ${data.savedir}/${models.KNN.name}.pkl
 
   NB:
     name: NB

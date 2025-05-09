@@ -8,6 +8,7 @@ import hydra
 import numpy as np
 import polars as pl
 import optuna
+from dotenv import load_dotenv
 from sklearn.discriminant_analysis import (
     LinearDiscriminantAnalysis,
     QuadraticDiscriminantAnalysis,
@@ -21,6 +22,8 @@ from sklearn.preprocessing import StandardScaler
 from omegaconf import DictConfig
 from rich.console import Console
 from rich.logging import RichHandler
+
+load_dotenv()
 
 console = Console(record=True)
 
