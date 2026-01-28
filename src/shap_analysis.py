@@ -1,10 +1,12 @@
 from pathlib import Path
 from typing import List
-from dotenv import load_dotenv
+
 import hydra
 import polars as pl
-from rich import print
+import shap
+from dotenv import load_dotenv
 from omegaconf import DictConfig
+from rich import print
 from sklearn.preprocessing import StandardScaler
 from utils import get_model, get_model_paths
 
@@ -32,13 +34,15 @@ def get_shap_values(
         sorted in descending order.
     """
     model = get_model(model_path)
-    data = pl.read_ipc(data_path)
+    data: pl.DataFrame = pl.read_ipc(data_path)
     X = data.drop(["Condition", "Strain", "Phenotype"]).to_pandas()
     X_std = StandardScaler().fit_transform(X)
     y = data["Phenotype"].to_numpy()
 
     # instantiate explainer
-    explainer = hydra.utils.instantiate(conf.explainer, model, X_std)
+    explainer: shap.TreeExplainer = hydra.utils.instantiate(
+        conf.explainer, model, X_std
+    )
 
     # compute shap values
     shap_values = explainer.shap_values(X_std, y, approximate=True)
@@ -82,14 +86,16 @@ def get_shap_folds(
         df_fold = get_shap_values(conf, model_path, data_path, fold)
         df_folds.append(df_fold)
 
-    final_df = pl.concat(df_folds)
+    final_df: pl.DataFrame = pl.concat(df_folds)
     final_df = final_df.group_by("Feature", maintain_order=True).agg(
         pl.col("Value").mean()
     )
     return final_df
 
 
-@hydra.main(config_path="../configs/", version_base="1.3", config_name="interpret")
+@hydra.main(  # pyrefly: ignore
+    config_path="../configs/", version_base="1.3", config_name="interpret"
+)
 def main(conf: DictConfig) -> None:
     """Main entry point for the script.
 
