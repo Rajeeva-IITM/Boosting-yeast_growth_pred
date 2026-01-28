@@ -175,7 +175,7 @@ def tune_RF(trial: optuna.Trial, X, y, config: DictConfig):
             min_samples_leaf=min_samples_leaf,
             # ccp_alpha=ccp_alpha,
             # n_streams=16,
-            # random_state=config.seed,
+            random_state=config.seed,
         )
         model.fit(X_train, y_train)
         y_pred = model.predict(X_test)
@@ -319,7 +319,7 @@ def run_study(
         optuna.study.Study: The study object.
     """
     pruner = optuna.pruners.HyperbandPruner()
-    sampler = optuna.samplers.TPESampler()
+    sampler = optuna.samplers.TPESampler(seed=conf.seed)
     study = optuna.create_study(
         study_name=study_name,
         direction="maximize",
@@ -405,8 +405,9 @@ def main(conf: DictConfig):
         X, y, test_size=0.2, random_state=conf.kfold_params.seed
     )
 
-    Xtrain = StandardScaler().fit_transform(Xtrain)
-    Xtest = StandardScaler().fit_transform(Xtest)
+    scaler = StandardScaler()
+    Xtrain = scaler.fit_transform(Xtrain)
+    Xtest = scaler.transform(Xtest)
 
     console.log("Training models", style="bold green", justify="center")
 

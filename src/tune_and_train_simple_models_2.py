@@ -166,7 +166,7 @@ def run_study(
 ):
     """Runs an Optuna study to optimize hyperparameters for a given model."""
     pruner = optuna.pruners.HyperbandPruner()
-    sampler = optuna.samplers.TPESampler()
+    sampler = optuna.samplers.TPESampler(seed=conf.seed)
     study = optuna.create_study(
         study_name=study_name,
         direction="maximize",
@@ -201,8 +201,9 @@ def main(conf: DictConfig):
         X, y, test_size=0.2, random_state=conf.kfold_params.seed
     )
 
-    Xtrain = StandardScaler().fit_transform(Xtrain)
-    Xtest = StandardScaler().fit_transform(Xtest)
+    scaler = StandardScaler()
+    Xtrain = scaler.fit_transform(Xtrain)
+    Xtest = scaler.transform(Xtest)
 
     console.log("Training models", style="bold green", justify="center")
 

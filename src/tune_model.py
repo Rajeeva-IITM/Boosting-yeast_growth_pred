@@ -201,7 +201,7 @@ def run_study(
         optuna.study.Study: The study object.
     """
     pruner = optuna.pruners.HyperbandPruner()
-    sampler = optuna.samplers.TPESampler()
+    sampler = optuna.samplers.TPESampler(seed=conf.seed)
     study = optuna.create_study(
         study_name=study_name,
         direction="maximize",
@@ -258,14 +258,17 @@ def main(conf: DictConfig):
             random_state=conf.seed,
         )
 
-        Xtrain = StandardScaler().fit_transform(Xtrain)
-        Xtest = StandardScaler().fit_transform(Xtest)
+        scaler = StandardScaler()
+        Xtrain = scaler.fit_transform(Xtrain)
+        Xtest = scaler.transform(Xtest)
 
     else:
         Xtest, ytest = get_data(
             conf.testing.test_dataset, run_type=conf.run_type, return_as_Xy=True
         )
-        Xtest = StandardScaler().fit_transform(Xtest)  # type: ignore
+        scaler = StandardScaler()
+        Xtrain = scaler.fit_transform(Xtrain)
+        Xtest = scaler.transform(Xtest)
 
     console.log("Data processed", style="bold green", justify="center")
 

@@ -351,7 +351,7 @@ def main(conf: DictConfig):
         study_name="sampler_study",
         directions=conf.study_directions,
         pruner=optuna.pruners.HyperbandPruner(),
-        sampler=optuna.samplers.TPESampler(),
+        sampler=optuna.samplers.TPESampler(seed=conf.seed),
         load_if_exists=True,
     )
 

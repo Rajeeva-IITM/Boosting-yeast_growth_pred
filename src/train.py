@@ -68,8 +68,9 @@ def main(conf: DictConfig):
             Xtrain, ytrain, test_size=conf.testing.test_frac, random_state=conf.seed
         )
 
-        Xtrain = StandardScaler().fit_transform(Xtrain)
-        Xtest = StandardScaler().fit_transform(Xtest)
+        scaler = StandardScaler()
+        Xtrain = scaler.fit_transform(Xtrain)
+        Xtest = scaler.transform(Xtest)
         console.log("Data processed", style="bold green", justify="center")
 
         for model_param_path in paths:
