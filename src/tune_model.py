@@ -107,8 +107,6 @@ def tune_LGBM(
         "early_stopping_rounds": config.model_params.early_stopping_rounds,
         "num_threads": config.model_params.num_threads,
         "boosting_type": config.model_params.boosting_type,
-        "device_type": config.model_params.device_type,
-        "gpu_use_dp": config.model_params.gpu_use_dp,
         "seed": config.seed,
         "lambda_l1": trial.suggest_float("lambda_l1", **config.model_params.lambda_l1),
         "lambda_l2": trial.suggest_float("lambda_l2", **config.model_params.lambda_l2),
@@ -127,6 +125,9 @@ def tune_LGBM(
         ),
         "learning_rate": trial.suggest_float(
             "learning_rate", **config.model_params.learning_rate
+        ),
+        "linear_tree": trial.suggest_categorical(
+            "linear_tree", **config.model_params.linear_tree
         ),
     }
 
