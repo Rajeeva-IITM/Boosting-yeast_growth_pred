@@ -272,3 +272,9 @@ yaml = { version = "==0.2.5", build = "h7f98852_2" }
 zeromq = { version = "==4.3.5", build = "h59595ed_1" }
 zipp = { version = "==3.17.0", build = "pyhd8ed1ab_0" }
 zstd = { version = "==1.5.5", build = "hfc55251_0" }
+shap = ">=0.45.1,<0.46"
+umap-learn = "<0.5.7"
+
+[pypi-dependencies]
+alibi = ">=0.9.6, <0.10"
+pyale = ">=1.2.0, <2"
